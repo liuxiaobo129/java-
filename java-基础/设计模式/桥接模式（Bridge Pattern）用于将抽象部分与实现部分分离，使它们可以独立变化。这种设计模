@@ -1,0 +1,106 @@
+桥接模式（Bridge Pattern）用于将抽象部分与实现部分分离，使它们可以独立变化。这种设计模式是结构型模式之一，通过组合而不是继承来让系统更加灵活。桥接模式常用于需要在不同的维度上扩展的场景下。下面用一个例子来说明桥接模式的应用。
+
+案例：不同颜色的形状
+
+假设我们要实现一套形状类库，形状可以是圆形、正方形等，每种形状可以有不同的颜色。使用桥接模式，我们可以将形状和颜色分离，避免产生过多的类组合。例如，如果不使用桥接模式，每种颜色和形状组合都要创建一个新的类，如 RedCircle、GreenCircle、RedSquare 等。这种方式不利于扩展和维护。
+
+1. 创建颜色接口
+
+定义颜色接口，使不同的颜色实现该接口。
+
+
+// Implementor: 定义颜色接口
+interface Color {
+    void applyColor();
+}
+
+// Concrete Implementors: 实现颜色接口
+class Red implements Color {
+    @Override
+    public void applyColor() {
+        System.out.println("Applying red color");
+    }
+}
+
+class Green implements Color {
+    @Override
+    public void applyColor() {
+        System.out.println("Applying green color");
+    }
+}
+
+
+
+2. 创建形状抽象类
+
+定义形状抽象类，并通过组合的方式包含 Color 接口的引用，使颜色可以动态地赋予不同的形状。
+
+
+
+// Abstraction: 定义形状抽象类
+abstract class Shape {
+    protected Color color;
+
+    // 通过构造方法传入颜色
+    public Shape(Color color) {
+        this.color = color;
+    }
+
+    // 具体形状需要实现的绘制方法
+    abstract void draw();
+}
+
+
+
+3. 创建具体的形状类
+
+具体的形状类实现 Shape 抽象类，通过调用颜色的 applyColor() 方法给形状上色。
+
+
+
+
+
+// Refined Abstraction: 定义具体的形状类
+class Circle extends Shape {
+    public Circle(Color color) {
+        super(color);
+    }
+
+    @Override
+    void draw() {
+        System.out.print("Drawing Circle with color: ");
+        color.applyColor();
+    }
+}
+
+class Square extends Shape {
+    public Square(Color color) {
+        super(color);
+    }
+
+    @Override
+    void draw() {
+        System.out.print("Drawing Square with color: ");
+        color.applyColor();
+    }
+}
+
+
+
+4. 使用桥接模式
+
+现在我们可以自由组合不同的颜色和形状，不需要为每种颜色和形状的组合创建新类。
+
+
+public class BridgePatternExample {
+    public static void main(String[] args) {
+        // 创建红色的圆形
+        Shape redCircle = new Circle(new Red());
+        redCircle.draw();
+
+        // 创建绿色的正方形
+        Shape greenSquare = new Square(new Green());
+        greenSquare.draw();
+    }
+}
+
