@@ -1,1 +1,71 @@
-git add .
+JDBC 中手动实现事务控制的示例
+
+
+
+1.	模拟 REQUIRED 行为
+
+
+public void methodA(Connection conn) throws SQLException {
+boolean originalAutoCommit = conn.getAutoCommit();
+try {
+    conn.setAutoCommit(false);
+    // 执行 SQL 操作
+    methodB(conn); // 嵌套调用
+    conn.commit();
+} catch (SQLException e) {
+    conn.rollback();
+} finally {
+    conn.setAutoCommit(originalAutoCommit);
+}
+}
+
+public void methodB(Connection conn) throws SQLException {
+    // 执行 SQL 操作，使用和 methodA 相同的事务
+}
+
+
+
+2.	模拟 REQUIRES_NEW 行为
+
+REQUIRES_NEW：暂停当前事务，创建一个新事务。JDBC 只能通过创建新的 Connection 实现隔离。
+
+public void methodC() throws SQLException {
+try (Connection conn = dataSource.getConnection()) {
+    conn.setAutoCommit(false);
+    // 执行 SQL 操作
+    conn.commit();
+} catch (SQLException e) {
+    // 处理异常
+}
+}
+
+
+在 methodA 中调用 methodC() 时，methodC 会开启一个新事务，独立于 methodA 的事务。
+
+
+
+4.	模拟 NOT_SUPPORTED 行为
+NOT_SUPPORTED：非事务执行。可以通过暂时将当前事务的 autoCommit 设置为 true 实现：
+
+public void methodE(Connection conn) throws SQLException {
+boolean originalAutoCommit = conn.getAutoCommit();
+conn.setAutoCommit(true); // 暂时关闭事务
+try {
+    // 执行 SQL 操作
+} finally {
+    conn.setAutoCommit(originalAutoCommit); // 恢复事务状态
+}
+}
+
+
+5.	模拟 MANDATORY 行为
+
+
+public void methodF(Connection conn) throws SQLException {
+if (conn.getAutoCommit()) {
+    throw new IllegalStateException("需要在事务中调用此方法");
+}
+// 执行 SQL 操作
+}
+
+
