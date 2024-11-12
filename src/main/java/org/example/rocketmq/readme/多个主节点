@@ -1,0 +1,32 @@
+环境准备与基础配置
+安装多个 Broker 实例：首先，需要在不同的服务器（或同一服务器的不同端口）上安装多个 RocketMQ Broker 实例。确保每个 Broker 实例的安装目录完整且独立，例如，在 Linux 系统中，可以将 Broker 安装在/usr/local/rocketmq/broker1、/usr/local/rocketmq/broker2等不同目录下。
+配置文件基础设置：对于每个 Broker 实例，都需要配置其broker.conf文件。基础配置包括指定 NameServer 地址、存储路径等。假设 NameServer 运行在localhost:9876，在broker.conf文件中配置如下：
+plaintext
+复制
+namesrvAddr = localhost:9876
+storePathCommitLog = /data/rocketmq/commitlog${brokerName}
+storePathConsumeQueue = /data/rocketmq/consumequeue${brokerName}
+这里${brokerName}是一个变量，稍后会根据每个 Broker 的名称进行替换，用于区分不同 Broker 的存储路径。
+配置多个主节点参数
+集群名称设置：在每个 Broker 的broker.conf文件中，设置相同的集群名称（clusterName），用于标识这些 Broker 属于同一个集群。例如：
+plaintext
+复制
+clusterName = my - rocketmq - cluster
+Broker 名称和角色设置：为每个 Broker 指定一个唯一的名称（brokerName），并将角色（brokerRole）设置为MASTER。例如，对于第一个主节点 Broker，在broker.conf文件中配置：
+plaintext
+复制
+brokerName = master - broker - 1
+brokerRole = MASTER
+对于第二个主节点 Broker，可以配置：
+plaintext
+复制
+brokerName = master - broker - 2
+brokerRole = MASTER
+端口设置（如果在同一服务器上）：如果多个 Broker 主节点运行在同一服务器上，需要为每个 Broker 配置不同的监听端口，以避免端口冲突。例如，对于第一个主节点，可以使用默认端口10911，在broker.conf文件中保持端口配置不变；对于第二个主节点，将监听端口修改为10912，添加配置：
+plaintext
+复制
+listenPort = 10912
+存储路径个性化（基于 Broker 名称）：根据之前在基础配置中提到的${brokerName}变量，在实际配置存储路径时，将变量替换为具体的 Broker 名称，以确保每个主节点的存储路径是独立的。例如，对于master - broker - 1，存储路径可能是/data/rocketmq/commitlog - master - broker - 1和/data/rocketmq/consumequeue - master - broker - 1；对于master - broker - 2，存储路径则是/data/rocketmq/commitlog - master - broker - 2和/data/rocketmq/consumequeue - master - broker - 2。
+启动多个主节点 Broker
+启动命令：在每个 Broker 实例的安装目录下，使用启动脚本启动 Broker。在 Linux 系统中，一般使用nohup sh bin/mqbroker -c conf/broker.conf &命令来启动 Broker。对于每个配置好的主节点 Broker，都需要分别执行这个启动命令。例如，对于安装在/usr/local/rocketmq/broker1目录下的第一个主节点，进入该目录后执行启动命令；对于安装在/usr/local/rocketmq/broker2目录下的第二个主节点，同样进入该目录后执行启动命令。
+检查启动状态：启动后，可以通过查看日志文件（通常位于logs目录下）或者使用jps命令（在 Java 进程运行环境下）查看是否有mqbroker进程来检查 Broker 是否成功启动。同时，也可以使用 RocketMQ 提供的管理工具（如mqadmin）来检查集群状态和 Broker 的角色等信息。例如，使用mqadmin clusterList -n localhost:9876命令来查看集群中的 Broker 列表、角色和状态等信息，确保多个主节点都正常启动并被正确识别

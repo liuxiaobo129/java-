@@ -89,6 +89,13 @@
             <version>1.4.6</version>
         </dependency>
 
+
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-client-java</artifactId>
+            <version>5.0.7</version>
+        </dependency>
+
     </dependencies>
 
     <build>

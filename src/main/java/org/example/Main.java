@@ -2,6 +2,7 @@ package org.example;
 
 //import org.example.aop.AppConfig;
 //import org.example.aop.MyService;
+import org.example.mybatis.spring.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
@@ -25,8 +26,11 @@ public class Main  {
 
 //
 //        // 获取代理对象
-//        MyService proxy = (MyService) context.getBean("myServiceProxy");
+        UserService proxy = (UserService) context.getBean("userService");
+
+        proxy.transferMoney("John Doe", "john.doe@example.com");
 //        proxy.myMethod(); // 应该会触发 before advice
+
     }
 
 

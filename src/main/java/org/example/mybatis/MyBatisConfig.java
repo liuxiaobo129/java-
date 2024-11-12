@@ -6,6 +6,7 @@ import org.apache.ibatis.session.SqlSessionFactoryBuilder;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.mapping.Environment;
+import org.example.mybatis.entity.User;
 import org.example.mybatis.mapper.UserMapper;
 
 import java.io.InputStream;
@@ -44,7 +45,16 @@ public class MyBatisConfig {
         // Create a SqlSession from the factory
         try (var session = sqlSessionFactory.openSession()) {
             UserMapper mapper = session.getMapper(UserMapper.class);
-            mapper.insertUser("John Doe", "john.doe@example.com");
+//            mapper.insertUser("John Doe", "john.doe@example.com");
+
+            User johnDoe = mapper.selectUserByNameOrEmail("John Doe", "john.doe@example.com");
+
+            System.out.println(johnDoe);
+
+            User johnDoe1 = mapper.selectUserByNameOrEmail("John Doe", "john.doe@example.com");
+
+            System.out.println(johnDoe1);
+
             session.commit(); // Commit the transaction
             System.out.println("MyBatis connected successfully!");
         } catch (Exception e) {

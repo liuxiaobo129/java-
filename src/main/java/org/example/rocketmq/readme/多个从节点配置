@@ -1,0 +1,34 @@
+环境准备与基础配置（与主节点协同）
+安装多个从节点实例：和主节点一样，首先要在服务器（可以和主节点在相同或不同服务器）上安装多个 RocketMQ Broker 从节点实例。确保每个从节点实例安装完整，安装目录独立，例如在 Linux 系统中，可以将从节点安装在/usr/local/rocketmq/slave1、/usr/local/rocketmq/slave2等不同目录下。
+配置文件基础设置（关联主节点）：每个从节点的broker.conf文件需要配置 NameServer 地址与主节点相同，存储路径也需要单独设置。假设 NameServer 运行在localhost:9876，在broker.conf文件中可配置如下：
+plaintext
+复制
+namesrvAddr = localhost:9876
+storePathCommitLog = /data/rocketmq/slave/commitlog${brokerName}
+storePathConsumeQueue = /data/rocketmq/slave/consumequeue${brokerName}
+这里同样有${brokerName}变量，会根据从节点名称替换，用于区分不同从节点的存储路径。
+配置从节点参数
+集群名称设置（与主节点一致）：在每个从节点的broker.conf文件中，设置和主节点相同的集群名称（clusterName），表明这些从节点与主节点属于同一个集群。例如：
+plaintext
+复制
+clusterName = my - rocketmq - cluster
+Broker 名称和角色设置：为每个从节点指定一个唯一的名称（brokerName），并将角色（brokerRole）设置为SLAVE。同时，需要指定其对应的主节点名称（brokerName）。例如，对于第一个从节点 Broker，在broker.conf文件中配置：
+plaintext
+复制
+brokerName = slave - broker - 1
+brokerRole = SLAVE
+masterBrokerName = master - broker - 1
+这里假设对应的主节点名称是master - broker - 1，你需要根据实际的主节点名称来配置。对于第二个从节点，可以配置：
+plaintext
+复制
+brokerName = slave - broker - 2
+brokerRole = SLAVE
+masterBrokerName = master - broker - 2
+端口设置（如果在同一服务器上）：如果多个从节点运行在同一服务器上，需要为每个从节点配置不同的监听端口，避免端口冲突。例如，对于第一个从节点，可以使用默认端口11011，在broker.conf文件中保持端口配置不变；对于第二个从节点，将监听端口修改为11012，添加配置：
+plaintext
+复制
+listenPort = 11012
+存储路径个性化（基于从节点名称）：根据之前${brokerName}变量，在实际配置存储路径时，将变量替换为具体的从节点名称，确保每个从节点的存储路径是独立的。例如，对于slave - broker - 1，存储路径可能是/data/rocketmq/slave/commitlog - slave - broker - 1和/data/rocketmq/slave/consumequeue - slave - broker - 1；对于slave - broker - 2，存储路径则是/data/rocketmq/slave/commitlog - slave - broker - 2和/data/rocketmq/slave/consumequeue - slave - broker - 2。
+启动多个从节点 Broker
+启动命令：在每个从节点实例的安装目录下，使用启动脚本启动从节点。在 Linux 系统中，一般使用nohup sh bin/mqbroker -c conf/broker.conf &命令启动。对于每个配置好的从节点 Broker，都要分别执行这个启动命令。例如，对于安装在/usr/local/rocketmq/slave1目录下的第一个从节点，进入该目录后执行启动命令；对于安装在/usr/local/rocketmq/slave2目录下的第二个从节点，同样进入该目录后执行启动命令。
+检查启动状态：启动后，通过查看日志文件（通常位于logs目录下）或者使用jps命令查看是否有mqbroker进程来检查从节点是否成功启动。也可以使用mqadmin工具检查集群状态和从节点的角色等信息。例如，使用mqadmin clusterList -n localhost:9876命令查看集群中的 Broker 列表、角色和状态等信息，确保多个从节点都正常启动并且正确关联到对应的主节点
