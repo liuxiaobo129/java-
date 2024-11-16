@@ -1,0 +1,61 @@
+class TokenBucket:
+    def __init__(self, capacity, refill_rate):
+        self.capacity = capacity
+        self.refill_rate = refill_rate
+        self.tokens = capacity  # 初始令牌数等于桶容量
+        self.last_refill_time = time.time()
+
+    def allow_request(self, tokens_needed):
+        current_time = time.time()
+        elapsed = current_time - self.last_refill_time
+        # 根据时间流逝生成令牌
+        self.tokens = min(self.capacity, self.tokens + elapsed * self.refill_rate)
+        self.last_refill_time = current_time
+
+        if tokens_needed <= self.tokens:
+            self.tokens -= tokens_needed  # 消耗令牌
+            return True
+        else:
+            return False  # 拒绝请求
+
+
+假设桶的容量是 10，生成速率为 2个令牌/秒，且桶开始时满了。
+
+代码解析：
+
+    1.  初始化时：桶的容量是 10，并且令牌数初始化为 10。
+    2.  第一次调用 allow_request(5)：
+    •   allow_request(5) 请求 5 个令牌，桶里有 10 个令牌，满足条件，所以请求被允许，桶中剩余令牌 5 个。
+    3.  等待 3 秒后调用 allow_request(6)：
+    •   在这 3 秒钟的等待期间，每秒会有 2 个令牌被添加到桶中，经过 3 秒后，桶中会有 6 个新的令牌，桶中的总令牌数变成 5 + 6 = 11，但是由于桶的容量为 10，所以最多只允许 10 个令牌。最终令牌数保持在桶的容量上，10 令牌。
+    •   当调用 allow_request(6) 请求 6 个令牌时，桶中的令牌数是 10，大于 6，因此请求被允许，剩余 4 个令牌。
+
+
+
+import time
+
+class LeakyBucket:
+    def __init__(self, capacity, leak_rate):
+        self.capacity = capacity
+        self.leak_rate = leak_rate
+        self.current_water = 0
+        self.last_time = time.time()
+
+    def allow_request(self, water):
+        current_time = time.time()
+        elapsed = current_time - self.last_time
+        # 桶中水量随着时间减少
+        self.current_water = max(0, self.current_water - elapsed * self.leak_rate)
+        self.last_time = current_time
+
+        if self.current_water + water <= self.capacity:
+            self.current_water += water
+            return True
+        else:
+            return False
+
+bucket = LeakyBucket(10, 2)  # 桶容量10，漏水速率2/s
+
+print(bucket.allow_request(5))  # 允许
+time.sleep(3)  # 空闲3秒
+print(bucket.allow_request(6))  # 因为水已流光，允许请求

@@ -1,0 +1,13 @@
+
+
+1、都存在deferredLogs、统一打印
+
+
+
+private EnvironmentPostProcessorApplicationListener(
+			Function<ClassLoader, EnvironmentPostProcessorsFactory> postProcessorsFactory) {
+		this.postProcessorsFactory = postProcessorsFactory;
+		this.deferredLogs = new DeferredLogs();
+}
+
+

@@ -1,0 +1,7 @@
+加载类的方式和过程的区别
+ClassLoader.loadClass的加载过程：
+当使用ClassLoader.loadClass方法时，它遵循 Java 的类加载机制。它首先会检查这个类是否已经被加载过，如果已经加载，则直接返回对应的Class对象。如果没有加载，它会根据类加载器的委托模型（双亲委托模型）来查找和加载类。一般来说，它会先委托给父类加载器去加载，如果父类加载器无法加载（返回null），才会自己尝试加载。
+例如，在一个 Web 应用中，WebAppClassLoader（应用类加载器）会先委托给ExtClassLoader（扩展类加载器）和BootstrapClassLoader（启动类加载器）去加载类，如果它们都无法加载，WebAppClassLoader才会在自己的类路径（如WEB - INF/classes和WEB - INF/lib）中查找并加载类。
+反射加载类的方式（以Class.forName为例）：
+Class.forName方法有两种重载形式，一种是带有ClassLoader参数的，另一种是不带的。不带ClassLoader参数的Class.forName方法会使用调用者的类加载器（默认是当前类的类加载器）来加载类。它在加载类的同时会对类进行初始化，这是和ClassLoader.loadClass的一个重要区别。也就是说，如果类中有静态代码块或者静态变量的初始化操作，使用Class.forName加载类时，这些操作会立即执行。
+例如，Class.forName("com.example.MyClass")会加载MyClass类并执行其静态初始化代码块，而classLoader.loadClass("com.example.MyClass")（假设classLoader是一个合适的类加载器）只会加载类，不会执行静态初始化代码块。
