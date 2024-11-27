@@ -1,0 +1,15 @@
+git remote -v
+
+git remote remove origin
+
+git remote add origin git@github.com:liuxiaobo129/mq.git 
+
+
+git remote set-url --commit origin git@github.com:liuxiaobo129/mq.git
+
+
+git remote set-url --push origin git@github.com:liuxiaobo129/mq.git  
+
+
+
+origin 是别名
