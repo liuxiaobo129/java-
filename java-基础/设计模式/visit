@@ -1,0 +1,62 @@
+// 元素接口
+interface Element {
+    void accept(Visitor visitor);
+}
+
+// 具体元素1
+class ConcreteElementA implements Element {
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
+    }
+
+    public void operationA() {
+        System.out.println("Operation A in ConcreteElementA");
+    }
+}
+
+// 具体元素2
+class ConcreteElementB implements Element {
+    public void accept(Visitor visitor) {
+        visitor.visit(this);
+    }
+
+    public void operationB() {
+        System.out.println("Operation B in ConcreteElementB");
+    }
+}
+
+// 访问者接口
+interface Visitor {
+    void visit(ConcreteElementA elementA);
+    void visit(ConcreteElementB elementB);
+}
+
+// 具体访问者1
+class ConcreteVisitor implements Visitor {
+    public void visit(ConcreteElementA elementA) {
+        System.out.println("Visiting ConcreteElementA");
+        elementA.operationA();
+    }
+
+    public void visit(ConcreteElementB elementB) {
+        System.out.println("Visiting ConcreteElementB");
+        elementB.operationB();
+    }
+}
+
+// 客户端代码
+public class VisitorPatternExample {
+    public static void main(String[] args) {
+        Element elementA = new ConcreteElementA();
+        Element elementB = new ConcreteElementB();
+
+        Visitor visitor = new ConcreteVisitor();
+
+        elementA.accept(visitor);
+        elementB.accept(visitor);
+    }
+}
+
+
+
+在访问者模式中，visit 方法的设计有其深刻的目的，主要是为了遵循“开闭原则”（Open/Closed Principle）。简单来说，访问者模式的关键优势在于它能允许你在不修改现有元素类的情况下，向这些类添加新的操作。这使得扩展功能时不需要改变元素的内部代码，从而保持系统的灵活性和可维护性。

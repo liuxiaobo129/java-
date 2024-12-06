@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://example.com/my-schema-namespace"
+        xmlns:tns="http://example.com/my-schema-namespace">
+    <element name="book">
+        <complexType>
+            <sequence>
+                <element name="title" type="string"/>
+                <element name="author" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="library">
+        <complexType>
+            <sequence>
+                <element ref="tns:book" maxOccurs="unbounded"/>
+            </sequence>
+        </complexType>
+    </element>
+</schema>
+
+
+
+
+targetNamespace="http://example.com/my-schema-namespace"明确指定了该 XML Schema 所定义的所有元素（如book、library）、类型以及属性（这里未展示属性定义）等所属的命名空间为http://example.com/my-schema-namespace。
+同时，通过xmlns:tns="http://example.com/my-schema-namespace"定义了一个前缀tns，用于在该 XML Schema 内部方便地引用属于http://example.com/my-schema-namespace这个命名空间的内容。例如，在定义library元素时，使用ref="tns:book"来引用之前定义的book元素，这里的tns前缀确保了准确指向该 XML Schema 自身所定义的book元素，而不是其他可能同名的元素来自其他命名空间。
