@@ -1,0 +1,4 @@
+1、LocalValidatorFactoryBean ---- 解析验证@NotNull等
+
+2、JSR 规范
+https://download.oracle.com/otn-pub/jcp/bean_validation-1.0-fr-oth-JSpec/bean_validation-1_0-final-spec.pdf?AuthParam=1741080362_bbd2870d3f90d5d59b5d047f5d001279
