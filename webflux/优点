@@ -1,0 +1,86 @@
+🔹 1. 线程模型：基于 Reactor 和 事件驱动
+	•	传统的 Spring MVC 是 阻塞式，默认使用 Servlet 线程池（Tomcat），每个请求都会占用一个线程，直到完成响应。
+	•	WebFlux 采用 Reactor（基于 Netty），线程不会被阻塞，而是通过 事件驱动模型 处理请求。
+
+示例：WebFlux 的 Netty 线程模型
+	•	所有 I/O 操作都是非阻塞的，Netty 使用少量的线程（EventLoop）处理大量请求。
+	•	WebFlux 只有 少量线程（通常是 CPU 核心数） 但可以处理大量并发请求。
+
+如果用 Netty 作为服务器，WebFlux 不会像 Tomcat 那样创建大量线程，而是利用 事件驱动的方式 复用线程。
+
+
+
+🔹 2. 数据处理方式：Mono / Flux
+
+在 WebFlux 中，数据流不是直接返回对象，而是返回 Mono<T> 或 Flux<T>，它们都是 异步数据流，支持流式处理，不会阻塞当前线程。
+
+示例：非阻塞数据流
+
+@GetMapping("/user/{id}")
+public Mono<User> getUser(@PathVariable String id) {
+    return userService.findById(id); // 非阻塞调用
+}
+
+这里的 findById(id) 方法返回 Mono<User>，当数据可用时，WebFlux 会异步返回，而不会阻塞线程等待数据库查询。
+
+🔹 3. 非阻塞 I/O（Reactive Driver）
+
+WebFlux 适用于 非阻塞的数据库驱动，如：
+	•	MongoDB（reactive-mongo-driver）
+	•	R2DBC（reactive JDBC 替代方案）
+	•	Redis（Lettuce）
+	•	Kafka（reactive-kafka）
+
+示例：非阻塞数据库查询
+@Repository
+public interface UserRepository extends ReactiveCrudRepository<User, String> {
+    Flux<User> findAll();
+}
+public Flux<User> getAllUsers() {
+    return userRepository.findAll(); // 非阻塞查询
+}
+
+与传统的 JPA（阻塞查询）不同，这里不会等待数据库查询完成，而是 返回一个流（Flux），数据准备好时再推送。
+
+
+
+🔹 4. 非阻塞调用链（Reactive Pipelines）
+
+WebFlux 允许 链式操作，不会像传统方式那样 等待前一个操作完成后才执行下一个。
+
+示例：多个异步任务组合
+
+
+@GetMapping("/combine/{id}")
+public Mono<Response> getCombinedData(@PathVariable String id) {
+    Mono<User> userMono = userService.findById(id);
+    Mono<Order> orderMono = orderService.findByUserId(id);
+
+    return Mono.zip(userMono, orderMono) // 非阻塞合并数据
+               .map(tuple -> new Response(tuple.getT1(), tuple.getT2()));
+}
+
+这里 userMono 和 orderMono 同时执行，不会阻塞线程 等待第一个完成后再执行第二个，提高了并发能力。
+
+
+🔹 5. 线程不会被阻塞等待外部服务
+
+在 WebFlux 中，调用外部 API 也是非阻塞的，比如 WebClient（替代 RestTemplate）。
+
+示例：WebClient 非阻塞 HTTP 请求
+
+
+WebClient client = WebClient.create("https://api.example.com");
+
+public Mono<String> fetchData() {
+    return client.get()
+                 .uri("/data")
+                 .retrieve()
+                 .bodyToMono(String.class);
+}
+
+传统的 RestTemplate 同步等待 HTTP 响应，期间线程无法处理其他请求。
+	•	WebClient 不会阻塞线程，当响应准备好后再通知应用处理。
+
+
+
