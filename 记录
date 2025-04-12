@@ -9,3 +9,10 @@
 9、transmittable-thread-local
 10、Micrometer
 11、Jool
+12、洋钱罐
+13、ObjectProvider<List<User> user>
+
+@Bean
+public A (ObjectProvider<List<User> user> users){
+
+}
