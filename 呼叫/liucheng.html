@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+📱 用户拨打：4001234567
+↓
+🌐 电信运营商（中国移动/联通等）
+↓
+🛰 SIP 中继（绑定 FreeSWITCH 的公网 IP）
+↓
+📡 FreeSWITCH（作为 SIP Server）
+↓
+🧠 进入拨号计划 → 触发 IVR 脚本
+↓
+🔊 播放语音：“欢迎致电，请按 1 客服，2 投诉”
+↓
+🎛️ 用户按下数字键（DTMF）
+↓
+📲 系统判断按键 → 使用 `transfer` 转接坐席分机
+↓
+☎️ 坐席客户端响铃（如注册的 1001）
+↓
+👩 坐席接听，开始通话
+↓
+🛑 任意一方挂断，通话结束 → 可录音 → 可记录日志
+</body>
+</html>
